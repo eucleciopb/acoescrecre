@@ -1,0 +1,137 @@
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Fundo escuro degradê */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom right, #141e30, #243b55);
+  color: #ffffff;
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+
+/* Container da tabela */
+.tabela-container {
+  overflow-x: auto;
+  margin-top: 30px;
+}
+
+/* Cartão central com efeito vidro */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  padding: 30px;
+  max-width: 95%;
+  margin: auto;
+  backdrop-filter: blur(8px);
+}
+
+/* Título centralizado */
+.glass-card h1 {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 28px;
+}
+
+.glass-card p {
+  text-align: center;
+  font-size: 16px;
+  color: #ddd;
+}
+
+/* Estilo da tabela */
+.tabela-acoes {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.tabela-acoes th,
+.tabela-acoes td {
+  padding: 12px 15px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tabela-acoes th {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #f1f1f1;
+  font-size: 15px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.tabela-acoes td {
+  background-color: rgba(255, 255, 255, 0.03);
+  font-size: 14px;
+}
+
+/* Destaques visuais */
+.ticker {
+  font-weight: bold;
+  color: #FFD700;
+}
+
+.estavel {
+  color: #ffcc00;
+  font-weight: bold;
+}
+
+.recomendado {
+  color: #00ffcc;
+  font-weight: bold;
+}
+
+.perigo {
+  color: #ff4444;
+  font-weight: bold;
+}
+
+/* Botão de voltar */
+.btn-voltar {
+  display: block;
+  margin: 40px auto 0;
+  padding: 12px 30px;
+  background-color: #FFD700;
+  color: #000;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  text-align: center;
+}
+
+.btn-voltar:hover {
+  background-color: #e6c200;
+}
+
+/* Responsivo para telas menores */
+@media (max-width: 768px) {
+  .tabela-acoes th,
+  .tabela-acoes td {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .glass-card h1 {
+    font-size: 22px;
+  }
+
+  .glass-card {
+    padding: 20px;
+  }
+
+  .btn-voltar {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}

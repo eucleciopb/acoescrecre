@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Análises Técnicas - Swing Trade</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1c1c3c, #3b2250);
+      color: white;
+    }
+    .container {
+      max-width: 95%;
+      margin: auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    p.description {
+      text-align: center;
+      font-size: 1rem;
+      margin-bottom: 10px;
+      color: #ddd;
+    }
+    #filtros {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    #filtros input {
+      padding: 8px;
+      width: 250px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      margin-right: 10px;
+    }
+    #filtros button {
+      padding: 8px 16px;
+      border: none;
+      background-color: #ffcc00;
+      color: black;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn {
+      display: block;
+      margin: 30px auto 0;
+      background-color: #ffcc00;
+      color: black;
+      padding: 12px 25px;
+      border: none;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: rgba(255,255,255,0.03);
+      border: 1px solid #444;
+      font-size: 0.8rem;
+    }
+    thead {
+      background-color: #111;
+    }
+    th, td {
+      padding: 8px;
+      text-align: center;
+      border-bottom: 1px solid #333;
+    }
+    th {
+      color: #ffcc00;
+      font-weight: bold;
+    }
+    tr:hover {
+      background-color: rgba(255,255,255,0.05);
+    }
+    .tendencia-Alta { color: #00e676; font-weight: bold; }
+    .tendencia-Baixa { color: #f44336; font-weight: bold; }
+    .tendencia-Estável { color: #ffc107; font-weight: bold; }
+    .destacado { background-color: #003300 !important; font-weight: bold; border: 2px solid #00ff80; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📊 Painel de Análises - Swing Trade</h1>
+    <p class="description">Lista de 100 ações reais da B3 com simulação de análise técnica:</p>
+    <p id="dataAtualizacao" class="description" style="font-size: 0.9rem;"></p>
+
+    <div id="filtros">
+      <input type="text" id="pesquisa" placeholder="Pesquisar por ticker ou recomendação...">
+      <button onclick="filtrarTabela()">🔍 Pesquisar</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th>Preço Atual</th>
+          <th>Tendência</th>
+          <th>Recomendação</th>
+          <th>Volatilidade</th>
+          <th>Preço Mínimo</th>
+          <th>Preço Máximo</th>
+          <th>Média 30d</th>
+          <th>Média 3d</th>
+          <th>Média 15d</th>
+          <th>Compra Ideal</th>
+          <th>Venda Sugerida</th>
+          <th>Potencial (%)</th>
+        </tr>
+      </thead>
+      <tbody id="tabelaAcoes"></tbody>
+    </table>
+
+    <a href="menu.html" class="btn">&larr; Voltar ao Menu</a>
+  </div>
+
+  <script>
+    const tickersReais = [
+      "PETR4", "VALE3", "ITUB4", "BBDC4", "ABEV3", "MGLU3", "BBAS3", "ELET3", "WEGE3", "B3SA3",
+      "RENT3", "LREN3", "RADL3", "BRFS3", "SUZB3", "VIVT3", "NTCO3", "HAPV3", "ASAI3", "RAIZ4",
+      "AZUL4", "GOLL4", "CMIG4", "CPLE6", "COGN3", "TOTS3", "CYRE3", "MRVE3", "EZTC3", "JHSF3",
+      "YDUQ3", "CSAN3", "RAIL3", "HYPE3", "USIM5", "UGPA3", "BRKM5", "SOMA3", "ARZZ3", "ALPA4",
+      "CRFB3", "SBSP3", "CCRO3", "MULT3", "ENBR3", "ENEV3", "ENGIE3", "CSMG3", "EMBR3", "FLRY3",
+      "MOVI3", "GOAU4", "GGBR4", "BEEF3", "PRIO3", "AURE3", "MEAL3", "CVCB3", "ECOR3", "SMTO3",
+      "MRFG3", "PCAR3", "BRML3", "CASH3", "IRBR3", "PETZ3", "ALSO3", "QUAL3", "AMER3", "LWSA3",
+      "DXCO3", "BPAC11", "RANI3", "TAEE11", "TRPL4", "CPFE3", "EGIE3", "NEOE3", "CEAB3", "IGTI11",
+      "ITSA4", "POSI3", "VAMO3", "CURY3", "MLAS3", "LIGT3", "MYPK3", "CAML3", "LOGG3", "NGRD3",
+      "PETR3", "VALE5", "ITUB3", "BBDC3", "SANB11", "OIBR3", "OIBR4", "SHOW3", "CLSA3", "AERI3"
+    ];
+    let indiceTicker = 0;
+    const tabela = document.getElementById("tabelaAcoes");
+
+    function gerarAcaoAleatoria() {
+      const precoAtual = parseFloat((Math.random() * 14 + 1).toFixed(2)); // 🔁 Substituir por fetch se quiser preço real
+      const tendencia = ["Alta", "Baixa", "Estável"][Math.floor(Math.random() * 3)];
+      const recomendacao = tendencia === "Alta" ? "Comprar" : tendencia === "Baixa" ? "Vender" : "Aguardar";
+      const volatilidade = (Math.random() * 5).toFixed(2) + "%";
+      const precoMin = parseFloat((precoAtual * (1 - Math.random() * 0.15)).toFixed(2));
+      const precoMax = parseFloat((precoAtual * (1 + Math.random() * 0.15)).toFixed(2));
+      const media30d = ((precoMin + precoMax) / 2).toFixed(2);
+      const media3d = (precoAtual * (0.95 + Math.random() * 0.1)).toFixed(2);
+      const media15d = (precoAtual * (0.9 + Math.random() * 0.1)).toFixed(2);
+      const compraIdeal = (precoAtual * 0.95).toFixed(2);
+      const vendaSugerida = (precoAtual * 1.10).toFixed(2);
+      const potencial = (((vendaSugerida - compraIdeal) / compraIdeal) * 100).toFixed(1);
+
+      return {
+        ticker: tickersReais[indiceTicker++ % tickersReais.length],
+        precoAtual: precoAtual.toFixed(2),
+        tendencia,
+        recomendacao,
+        volatilidade,
+        precoMin: precoMin.toFixed(2),
+        precoMax: precoMax.toFixed(2),
+        media30d,
+        media3d,
+        media15d,
+        compraIdeal,
+        vendaSugerida,
+        potencial
+      };
+    }
+
+    let acoes = Array.from({ length: 100 }, gerarAcaoAleatoria)
+      .sort((a, b) => parseFloat(b.potencial) - parseFloat(a.potencial));
+
+    function preencherTabela(lista) {
+      tabela.innerHTML = "";
+      lista.forEach(acao => {
+        const tr = document.createElement("tr");
+        tr.className = acao.recomendacao === "Comprar" ? "destacado" : "";
+        tr.innerHTML = `
+          <td>${acao.ticker}</td>
+          <td>R$ ${acao.precoAtual}</td>
+          <td class="tendencia-${acao.tendencia}">${acao.tendencia}</td>
+          <td>${acao.recomendacao}</td>
+          <td>${acao.volatilidade}</td>
+          <td>R$ ${acao.precoMin}</td>
+          <td>R$ ${acao.precoMax}</td>
+          <td>R$ ${acao.media30d}</td>
+          <td>R$ ${acao.media3d}</td>
+          <td>R$ ${acao.media15d}</td>
+          <td>R$ ${acao.compraIdeal}</td>
+          <td>R$ ${acao.vendaSugerida}</td>
+          <td>${acao.potencial}%</td>
+        `;
+        tabela.appendChild(tr);
+      });
+    }
+
+    function filtrarTabela() {
+      const termo = document.getElementById("pesquisa").value.toLowerCase();
+      const filtradas = acoes.filter(a =>
+        a.ticker.toLowerCase().includes(termo) ||
+        a.recomendacao.toLowerCase().includes(termo)
+      );
+      preencherTabela(filtradas);
+    }
+
+    function formatarDataHoraAtual() {
+      const agora = new Date();
+      const dia = agora.toLocaleDateString('pt-BR');
+      const hora = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      return `Atualizado em ${dia} às ${hora}`;
+    }
+
+    document.getElementById("dataAtualizacao").textContent = formatarDataHoraAtual();
+    preencherTabela(acoes);
+  </script>
+</body>
+</html>
